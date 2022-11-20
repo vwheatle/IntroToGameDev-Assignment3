@@ -47,8 +47,5 @@ public class EnemyFollow : MonoBehaviour {
 		agent.enabled = true;
 	}
 	
-	void Scare() {
-		Debug.Log("scared");
-		agent.ResetPath();
-	}
+	void Scare() { agent.ResetPath(); }
 }
