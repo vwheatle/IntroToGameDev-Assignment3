@@ -7,10 +7,10 @@ public class WarpZone : MonoBehaviour {
 	// PLEASE DON'T OVERLAP THIS DESTINATION WITH ANOTHER WARP'S TRIGGER! (lol)
 	
 	void OnTriggerEnter(Collider other) {
+		// Debug.Log($"Calling 'WarpTo' on {other.gameObject.name}");
 		bool prevStatus = other.enabled;
-		other.enabled = false;
-		other.transform.position = (other.transform.position - this.transform.position) + jumpTo.position;
-		other.enabled = prevStatus;
+		Vector3 warpPosition = (other.transform.position - this.transform.position) + jumpTo.position;
+		other.gameObject.SendMessage("WarpTo", warpPosition, SendMessageOptions.DontRequireReceiver);
 	}
 	
 	void OnDrawGizmosSelected() {
@@ -20,7 +20,7 @@ public class WarpZone : MonoBehaviour {
 		
 		// Yes i am drawing debug beziers. Sorry.
 		Vector3 middleControlPoint = Vector3.Lerp(this.transform.localPosition, this.jumpTo.position, 0.5f);
-		middleControlPoint.y += Vector3.Distance(this.transform.localPosition, this.jumpTo.position) * 0.4f;
+		middleControlPoint.y += Vector3.Distance(this.transform.localPosition, this.jumpTo.position) / 2;
 		
 		int points = 8;
 		Vector3 last = this.transform.localPosition, next;

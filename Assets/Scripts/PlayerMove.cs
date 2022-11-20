@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour {
 	CharacterController cc;
+	Animator animator;
 	
 	public float moveSpeed = 2f;
 	
+	float y;
+	
 	void Start() {
 		cc = GetComponent<CharacterController>();
+		animator = GetComponent<Animator>();
+		
+		y = transform.localPosition.y;
 	}
 	
 	void Update() {
@@ -17,13 +23,66 @@ public class PlayerMove : MonoBehaviour {
 			Input.GetAxisRaw("Vertical")
 		).normalized * moveSpeed;
 		
-		Vector3 move = new Vector3(
-			wasd.x, 0f, wasd.y
-		);
+		Vector3 move = new Vector3(wasd.x, 0f, wasd.y);
 		
+		bool isWalking = !Mathf.Approximately(move.magnitude, 0f);
+		animator.SetBool("IsWalking", isWalking);
+			
 		cc.Move(move * Time.deltaTime);
+		LookAtMouse();
 		
+		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
-		a.y = 0f; this.transform.position = a;
+		a.y = y; this.transform.position = a;
+	}
+	
+	void LookAtMouse() {
+		Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+		Plane xzPlane = new Plane(Vector3.up, 0f);
+		Vector3 direction = IntersectRayWithPlane(cameraRay, xzPlane).GetValueOrDefault();
+		direction -= transform.position; direction.y = 0;
+		transform.localRotation = Quaternion.LookRotation(direction);
+	}
+	
+	// Don't want to bother with collision layers, so I'm just gonna
+	// steal from this: https://stackoverflow.com/a/58819973/
+	//
+	// Returns the point at which the ray intersects the plane.
+	Vector3? IntersectRayWithPlane(Ray ray, Plane plane) {
+		// How similar is the ray's direction to the plane's normal vector?
+		// (We have to flip the normal result the ray points from the origin
+		//  down to the plane, and the plane points up from its surface.)
+		float directionSimilarity = -Vector3.Dot(plane.normal, ray.direction);
+		
+		// Prevent Divide-by-Zero when ray is perpendicular to plane.
+		if (Mathf.Approximately(Mathf.Abs(directionSimilarity), 0f))
+			return null;
+		
+		// I hate mathematicians and their single-letter variables.
+		float rayIntersectLength =
+			(Vector3.Dot(plane.normal, ray.origin) + plane.distance) / directionSimilarity;
+		// == The "Do you understand the code you copy" Corner ==
+		// - Flips sign because ray points against plane normal.
+		// - Gets similarity between the plane's normal and the ray's origin,
+		//   (but note that ray's origin isn't necessarily normalized! it's
+		//    a position, not a direction...)
+		
+		// Oh I see, it's dividing "the similarity between the ray's direction
+		// and the plane's normal" against "the similarity between the ray's
+		// position and the plane's normal", and offsetting it by the plane's
+		// distance from the origin.
+		// Can't quite follow it all the way, but it makes a bit more sense.
+		
+		// Ignore intersection if ray starts and ends below the plane.
+		if (rayIntersectLength < 0f) return null;
+		
+		return ray.origin + rayIntersectLength * ray.direction;
+	}
+	
+	void WarpTo(Vector3 warpPosition) {
+		Collider c = this.GetComponent<Collider>();
+		cc.enabled = false;
+		transform.position = warpPosition;
+		cc.enabled = true;
 	}
 }

@@ -23,9 +23,15 @@ public class EnemyFollow : MonoBehaviour {
 		);
 	}
 	
-	void Update() {
+	void LateUpdate() {
 		// Approach thing.
 		GameObject nearestTarget = em.GetTargetNearestTo(transform.position);
-		agent.SetDestination(nearestTarget.transform.position);
+		agent.destination = nearestTarget.transform.position;
+	}
+	
+	void WarpTo(Vector3 warpPosition) {
+		agent.enabled = false;
+		transform.position = warpPosition;
+		agent.enabled = true;
 	}
 }
