@@ -31,6 +31,11 @@ public class PlayerMove : MonoBehaviour {
 		cc.Move(move * Time.deltaTime);
 		LookAtMouse();
 		
+		if (Input.GetButtonDown("Scare") || Input.GetButtonUp("Scare")) {
+			GameObject.Find("Enemies")
+				.BroadcastMessage("Scare", SendMessageOptions.DontRequireReceiver);
+		}
+		
 		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
 		a.y = y; this.transform.position = a;
