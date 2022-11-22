@@ -24,7 +24,7 @@ public class EnemyManager : MonoBehaviour {
 		}
 	}
 	
-	void SpawnEnemy() {
+	Vector3? GetNewSpawnPosition() {
 		int tries = spawns.Count;
 		int firstTry = Random.Range(0, tries), tryOffset;
 		
@@ -40,32 +40,37 @@ public class EnemyManager : MonoBehaviour {
 			
 			// Check for if the moving target (player) is too close to safely spawn.
 			GameObject target = GetTargetNearestTo(spawnPos);
-			if (Vector3.Distance(target.transform.position, spawnPos) < minTargetDistance) {
-				// Debug.Log($"A target was too close to safely spawn an enemy '{spawnPos}'.");
+			if (Vector3.Distance(target.transform.position, spawnPos) < minTargetDistance)
 				continue;
-			}
 			
 			// Check for if another enemy is too close to safely spawn.
 			Vector3 bounds = new Vector3(minAnythingElseDistance, 1f, minAnythingElseDistance) / 2;
-			if (Physics.CheckBox(spawnPos, bounds)) {
-				// Debug.Log($"Something else was too close to safely spawn an enemy at '{spawnPos}'.");
+			if (Physics.CheckBox(spawnPos, bounds))
 				continue;
-			}
 			
+			// If all succeeds, return the position!
+			return spawnPos;
+		}
+		
+		// Failed to spawn a thing!
+		return null;
+	}
+	
+	void SpawnEnemy() {
+		Vector3? spawnPos = GetNewSpawnPosition();
+		if (spawnPos.HasValue) {
 			// If all succeeds, spawn a thing!
 			Instantiate(
 				spawnableEnemies[Random.Range(0, spawnableEnemies.Count)],
-				spawnPos, Quaternion.identity, this.transform
+				spawnPos.Value, Quaternion.identity, this.transform
 			);
 			
 			// Reset the timer.
 			enemySpawnTime = Time.time;
-			
-			return;
+		} else {
+			// Failed to spawn a thing!
+			Debug.Log("failed to spawn anything!");
 		}
-		
-		// Failed to spawn a thing!
-		Debug.Log("failed to spawn anything!");
 	}
 	
 	public GameObject GetTargetNearestTo(Vector3 position) {
