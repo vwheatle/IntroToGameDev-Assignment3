@@ -6,15 +6,19 @@ public class PlayerMove : MonoBehaviour {
 	CharacterController cc;
 	Animator animator;
 	
+	Transform gunBarrelEnd;
+	
 	public float moveSpeed = 2f;
 	
-	float y;
+	float startY;
 	
 	void Start() {
 		cc = GetComponent<CharacterController>();
 		animator = GetComponent<Animator>();
 		
-		y = transform.localPosition.y;
+		startY = transform.localPosition.y;
+		
+		gunBarrelEnd = transform.Find("GunBarrelEnd");
 	}
 	
 	void Update() {
@@ -33,12 +37,14 @@ public class PlayerMove : MonoBehaviour {
 		
 		if (Input.GetButtonDown("Scare") || Input.GetButtonUp("Scare")) {
 			GameObject.Find("Enemies")
-				.BroadcastMessage("Scare", SendMessageOptions.DontRequireReceiver);
+				.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
 		}
+		
+		Shoot();
 		
 		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
-		a.y = y; this.transform.position = a;
+		a.y = startY; this.transform.position = a;
 	}
 	
 	void LookAtMouse() {
@@ -47,6 +53,22 @@ public class PlayerMove : MonoBehaviour {
 		Vector3 direction = IntersectRayWithPlane(cameraRay, xzPlane).GetValueOrDefault();
 		direction -= transform.position; direction.y = 0;
 		transform.localRotation = Quaternion.LookRotation(direction);
+	}
+	
+	void Shoot() {
+		RaycastHit hit;
+		if (Physics.Raycast(
+			gunBarrelEnd.transform.position,
+			gunBarrelEnd.transform.forward,
+			out hit, float.PositiveInfinity, -1,
+			QueryTriggerInteraction.Collide
+		)) {
+			hit.collider.BroadcastMessage(
+				"Hurt", Random.Range(0.5f, 0.75f),
+				SendMessageOptions.DontRequireReceiver
+			);
+			Debug.DrawLine(gunBarrelEnd.transform.position, hit.point, Color.red);
+		}
 	}
 	
 	// Don't want to bother with collision layers, so I'm just gonna

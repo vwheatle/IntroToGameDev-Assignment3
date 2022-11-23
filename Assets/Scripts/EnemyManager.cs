@@ -13,6 +13,11 @@ public class EnemyManager : MonoBehaviour {
 	public float minTargetDistance = 12f;
 	public float minAnythingElseDistance = 3.5f;
 	
+	bool scared_ = false;
+	public bool scared {
+		get => scared_;
+	}
+	
 	void Setup() {
 		enemySpawnTime = Time.time;
 	}
@@ -70,6 +75,13 @@ public class EnemyManager : MonoBehaviour {
 		} else {
 			// Failed to spawn a thing!
 			Debug.Log("failed to spawn anything!");
+		}
+	}
+	
+	void Scare() {
+		scared_ = !scared_;
+		foreach (Transform t in this.transform) {
+			t.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 	
