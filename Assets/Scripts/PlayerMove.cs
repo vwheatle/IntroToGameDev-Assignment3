@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour {
 	CharacterController cc;
 	Animator animator;
+	new AudioSource audio;
 	
 	Transform gunBarrelEnd;
 	
@@ -12,13 +13,21 @@ public class PlayerMove : MonoBehaviour {
 	
 	float startY;
 	
+	public float fireRate = 2f;
+	float lastFire;
+	
 	void Start() {
+		// TODO: https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake.html
+		// should use this when getting components and suck..
 		cc = GetComponent<CharacterController>();
 		animator = GetComponent<Animator>();
+		audio = GetComponent<AudioSource>();
 		
 		startY = transform.localPosition.y;
 		
 		gunBarrelEnd = transform.Find("GunBarrelEnd");
+		
+		lastFire = Time.time;
 	}
 	
 	void Update() {
@@ -40,7 +49,15 @@ public class PlayerMove : MonoBehaviour {
 				.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		Shoot();
+		float fireTime = Time.time - lastFire;
+		if (fireTime >= fireRate) {
+			if (Input.GetButton("Fire1")) {
+				Shoot();
+				lastFire += fireRate;
+			} else {
+				lastFire = Time.time - fireRate * 1.1f;
+			}
+		}
 		
 		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
@@ -60,15 +77,21 @@ public class PlayerMove : MonoBehaviour {
 		if (Physics.Raycast(
 			gunBarrelEnd.transform.position,
 			gunBarrelEnd.transform.forward,
-			out hit, float.PositiveInfinity, -1,
+			out hit, 32f, -1,
 			QueryTriggerInteraction.Collide
 		)) {
 			hit.collider.BroadcastMessage(
-				"Hurt", Random.Range(0.5f, 0.75f),
+				"Hurt", Random.Range(0.9f, 1.2f),
 				SendMessageOptions.DontRequireReceiver
 			);
-			Debug.DrawLine(gunBarrelEnd.transform.position, hit.point, Color.red);
+			
+			// TODO: line drawing..
+			// https://docs.unity3d.com/Manual/class-LineRenderer.html
+			Debug.DrawLine(gunBarrelEnd.transform.position, hit.point, Color.red, 1f);
 		}
+		
+		audio.pitch = Random.Range(0.9f, 1.1f);
+		audio.Play();
 	}
 	
 	// Don't want to bother with collision layers, so I'm just gonna

@@ -9,7 +9,6 @@ public class EnemyFollow : MonoBehaviour {
 	bool alive = true;
 	
 	NavMeshAgent agent;
-	
 	Animator animator;
 	
 	public float maxHealth = 3f;
@@ -17,7 +16,6 @@ public class EnemyFollow : MonoBehaviour {
 	
 	void Start() {
 		agent = GetComponent<NavMeshAgent>();
-		
 		animator = GetComponent<Animator>();
 		
 		em = transform.parent.GetComponent<EnemyManager>();
@@ -28,6 +26,8 @@ public class EnemyFollow : MonoBehaviour {
 			nearestTarget.transform.position - transform.position,
 			Vector3.up
 		);
+		
+		health = maxHealth;
 	}
 	
 	void LateUpdate() {
@@ -68,6 +68,9 @@ public class EnemyFollow : MonoBehaviour {
 	
 	// Built-in animation event...
 	void StartSinking() {
-		Destroy(this.gameObject);
+		// Now this looks like a job for   ShrinkDie.cs
+		ShrinkDie die = this.gameObject.AddComponent<ShrinkDie>();
+		die.StartShrink();
+		Destroy(this);
 	}
 }
