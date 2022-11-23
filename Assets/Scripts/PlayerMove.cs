@@ -13,8 +13,10 @@ public class PlayerMove : MonoBehaviour {
 	
 	float startY;
 	
+	public GameObject bulletEffect;
 	public float fireRate = 2f;
 	float lastFire;
+	public float fireRange = 32f;
 	
 	void Start() {
 		// TODO: https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake.html
@@ -74,21 +76,27 @@ public class PlayerMove : MonoBehaviour {
 	
 	void Shoot() {
 		RaycastHit hit;
+		Vector3 target;
 		if (Physics.Raycast(
 			gunBarrelEnd.transform.position,
 			gunBarrelEnd.transform.forward,
-			out hit, 32f, -1,
+			out hit, fireRange, -1,
 			QueryTriggerInteraction.Collide
 		)) {
 			hit.collider.BroadcastMessage(
 				"Hurt", Random.Range(0.9f, 1.2f),
 				SendMessageOptions.DontRequireReceiver
 			);
-			
-			// TODO: line drawing..
-			// https://docs.unity3d.com/Manual/class-LineRenderer.html
-			Debug.DrawLine(gunBarrelEnd.transform.position, hit.point, Color.red, 1f);
+			target = hit.point;
+		} else {
+			target = gunBarrelEnd.transform.position +
+				gunBarrelEnd.transform.forward * fireRange;
 		}
+		
+		GameObject bullet = Instantiate(bulletEffect);
+		LineRenderer line = bullet.GetComponent<LineRenderer>();
+		Vector3[] positions = { gunBarrelEnd.transform.position, target };
+		line.SetPositions(positions);
 		
 		audio.pitch = Random.Range(0.9f, 1.1f);
 		audio.Play();
