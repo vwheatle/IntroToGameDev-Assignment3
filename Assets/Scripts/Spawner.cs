@@ -18,7 +18,7 @@ public class Spawner : MonoBehaviour {
 	
 	// === UNITY CALLBACK ZONE ===
 	
-	void Start() {
+	void Awake() {
 		spawnTime = Time.time;
 	}
 	

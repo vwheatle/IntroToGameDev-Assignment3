@@ -32,7 +32,7 @@ public class EnemyManager : MonoBehaviour {
 		return nearest;
 	}
 	
-	void DrawX(Vector3 position, float size) {
+	void GizmosDrawX(Vector3 position, float size) {
 		Vector3 v1 = new Vector3(+1f, 0f, 1f) * size;
 		Vector3 v2 = new Vector3(-1f, 0f, 1f) * size;
 		
@@ -44,7 +44,7 @@ public class EnemyManager : MonoBehaviour {
 		Gizmos.color = Color.red;
 		foreach (GameObject target in targets) {
 			if (!target) continue;
-			DrawX(target.transform.position, 1f);
+			GizmosDrawX(target.transform.position, 1f);
 		}
 	}
 }

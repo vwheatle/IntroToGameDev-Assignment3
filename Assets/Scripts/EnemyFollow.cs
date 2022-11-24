@@ -14,20 +14,22 @@ public class EnemyFollow : MonoBehaviour {
 	public float maxHealth = 3f;
 	float health = -1f;
 	
-	void Start() {
+	void Awake() {
 		agent = GetComponent<NavMeshAgent>();
 		animator = GetComponent<Animator>();
 		
 		em = transform.parent.GetComponent<EnemyManager>();
 		
+		health = maxHealth;
+	}
+	
+	void Start() {
 		// Begin by looking at thing to follow.
 		GameObject nearestTarget = em.GetTargetNearestTo(transform.position);
 		transform.rotation = Quaternion.LookRotation(
 			nearestTarget.transform.position - transform.position,
 			Vector3.up
 		);
-		
-		health = maxHealth;
 	}
 	
 	void LateUpdate() {

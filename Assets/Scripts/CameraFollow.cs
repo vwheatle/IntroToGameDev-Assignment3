@@ -10,7 +10,9 @@ public class CameraFollow : MonoBehaviour {
 	Vector3 offset;
 	Vector3 currVelocity;
 	
-	void Start() {
+	void Awake() {
+		// Risky but eh, it's supposed to follow the player's initial
+		// position, not any position after they're moving.
 		offset = this.transform.position - thing.transform.position;
 		currVelocity = Vector3.zero;
 	}

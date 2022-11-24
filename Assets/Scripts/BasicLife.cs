@@ -6,7 +6,7 @@ public class BasicLife : MonoBehaviour {
 	public float deathTime = 10f;
 	private float startTime = 0f;
 	
-	void Start() {
+	void Awake() {
 		startTime = Time.unscaledTime;
 	}
 	

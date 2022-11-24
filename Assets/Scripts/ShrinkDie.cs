@@ -12,7 +12,7 @@ public class ShrinkDie : MonoBehaviour {
 	
 	Vector3 initialScale = Vector3.one;
 	
-	void Start() {
+	void Awake() {
 		initialScale = transform.localScale;
 	}
 	

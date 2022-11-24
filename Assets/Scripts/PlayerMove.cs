@@ -18,9 +18,7 @@ public class PlayerMove : MonoBehaviour {
 	float lastFire;
 	public float fireRange = 32f;
 	
-	void Start() {
-		// TODO: https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake.html
-		// should use this when getting components and suck..
+	void Awake() {
 		cc = GetComponent<CharacterController>();
 		animator = GetComponent<Animator>();
 		audio = GetComponent<AudioSource>();
@@ -32,25 +30,15 @@ public class PlayerMove : MonoBehaviour {
 		lastFire = Time.time;
 	}
 	
+	// TODO: i need to remake the navmesh for big enemies. with he big radius.
+	
 	void Update() {
-		Vector2 wasd = new Vector2(
-			Input.GetAxisRaw("Horizontal"),
-			Input.GetAxisRaw("Vertical")
-		).normalized * moveSpeed;
-		
-		Vector3 move = new Vector3(wasd.x, 0f, wasd.y);
-		
-		bool isWalking = !Mathf.Approximately(move.magnitude, 0f);
+		// Move around..
+		bool isWalking = Move();
 		animator.SetBool("IsWalking", isWalking);
-			
-		cc.Move(move * Time.deltaTime);
 		LookAtMouse();
 		
-		if (Input.GetButtonDown("Scare") || Input.GetButtonUp("Scare")) {
-			GameObject.Find("Enemies")
-				.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
-		}
-		
+		// Shoot at a fixed interval...
 		float fireTime = Time.time - lastFire;
 		if (fireTime >= fireRate) {
 			if (Input.GetButton("Fire1")) {
@@ -61,11 +49,33 @@ public class PlayerMove : MonoBehaviour {
 			}
 		}
 		
+		// Scare enemies..
+		if (Input.GetButtonDown("Scare") || Input.GetButtonUp("Scare")) {
+			GameObject.Find("Enemies")
+				.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
+		}
+		
 		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
 		a.y = startY; this.transform.position = a;
 	}
 	
+	// Moves the character controller in response to WASD stuff.
+	// Returns if you moved a non-zero amount.
+	bool Move() {
+		Vector2 wasd = new Vector2(
+			Input.GetAxisRaw("Horizontal"),
+			Input.GetAxisRaw("Vertical")
+		).normalized;
+		
+		Vector3 move = new Vector3(wasd.x, 0f, wasd.y) * moveSpeed;
+		
+		cc.Move(move * Time.deltaTime);
+		
+		return !Mathf.Approximately(move.magnitude, 0f);
+	}
+	
+	// Rotates the character towards the place the mouse is over.
 	void LookAtMouse() {
 		Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		Plane xzPlane = new Plane(Vector3.up, 0f);
@@ -74,6 +84,7 @@ public class PlayerMove : MonoBehaviour {
 		transform.localRotation = Quaternion.LookRotation(direction);
 	}
 	
+	// Shoots a bullet at enemies.
 	void Shoot() {
 		RaycastHit hit;
 		Vector3 target;
@@ -93,11 +104,13 @@ public class PlayerMove : MonoBehaviour {
 				gunBarrelEnd.transform.forward * fireRange;
 		}
 		
+		// Make a "bullet effect", which is the line that appears when you shoot.
 		GameObject bullet = Instantiate(bulletEffect);
 		LineRenderer line = bullet.GetComponent<LineRenderer>();
 		Vector3[] positions = { gunBarrelEnd.transform.position, target };
 		line.SetPositions(positions);
 		
+		// Pew pew sound
 		audio.pitch = Random.Range(0.9f, 1.1f);
 		audio.Play();
 	}
@@ -137,6 +150,7 @@ public class PlayerMove : MonoBehaviour {
 		return ray.origin + rayIntersectLength * ray.direction;
 	}
 	
+	// Message from WarpZone, will correctly warp the player to the new position.
 	void WarpTo(Vector3 warpPosition) {
 		Collider c = this.GetComponent<Collider>();
 		cc.enabled = false;

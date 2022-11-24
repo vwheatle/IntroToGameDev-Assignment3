@@ -1220,7 +1220,7 @@ MonoBehaviour:
   spawnables: []
   spawnInterval: 10
   avoidTargets: []
-  minTargetDistance: 12
+  minTargetDistance: 0
   minAnythingElseDistance: 3.5
   giveUpIfSpawnFails: 1
 --- !u!4 &860132451
