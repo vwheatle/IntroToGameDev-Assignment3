@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5743740015426629475}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Trunk1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5743740015426629449}
   - component: {fileID: 5743740015421455979}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Hellephant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 5743740015925496960}
   - component: {fileID: 5370864757118581394}
   - component: {fileID: 5743740015925496990}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: EnemyHellephant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5743740015426728815}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1.5
+  m_Radius: 1
   m_Speed: 2
   m_Acceleration: 6
   avoidancePriority: 50
@@ -215,7 +215,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
+  m_Size: {x: 1.9, y: 1.9, z: 1.9}
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!54 &5743740015925496990
 Rigidbody:

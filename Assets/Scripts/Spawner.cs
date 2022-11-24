@@ -64,6 +64,7 @@ public class Spawner : MonoBehaviour {
 			
 			// Check for if the moving target (player) is too close to safely spawn.
 			GameObject target = GetTargetNearestTo(spawnPos);
+			if (target)
 			if (Vector3.Distance(target.transform.position, spawnPos) < minTargetDistance)
 				continue;
 			

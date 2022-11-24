@@ -30,8 +30,6 @@ public class PlayerMove : MonoBehaviour {
 		lastFire = Time.time;
 	}
 	
-	// TODO: i need to remake the navmesh for big enemies. with he big radius.
-	
 	void Update() {
 		// Move around..
 		bool isWalking = Move();
@@ -91,7 +89,8 @@ public class PlayerMove : MonoBehaviour {
 		if (Physics.Raycast(
 			gunBarrelEnd.transform.position,
 			gunBarrelEnd.transform.forward,
-			out hit, fireRange, -1,
+			out hit, fireRange,
+			1 << LayerMask.NameToLayer("Shoot"),
 			QueryTriggerInteraction.Collide
 		)) {
 			hit.collider.BroadcastMessage(

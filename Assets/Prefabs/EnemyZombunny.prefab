@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4093280172866383922}
   - component: {fileID: 3982338241750656408}
   - component: {fileID: 277159477042251580}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: EnemyZombunny
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4093280172866775798}
   - component: {fileID: 4093280172852689822}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Zombunny
   m_TagString: Untagged
   m_Icon: {fileID: 0}
