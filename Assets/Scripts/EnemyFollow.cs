@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyFollow : MonoBehaviour {
@@ -10,13 +8,17 @@ public class EnemyFollow : MonoBehaviour {
 	
 	NavMeshAgent agent;
 	Animator animator;
+	new AudioSource audio;
 	
-	public float hurtPower = 1f;
-	public float hurtRange = 0.75f;
+	public float attackRate = 2f;
+	float lastAttack;
+	
+	public float attackPower = 1f;
+	public float attackRange = 0.75f;
 	// this is really naive, it checks the distance between this enemy
 	// and the target's origin.. this means that large targets with
 	// large colliders won't ever get hurt because they'll never be
-	// "within the hurtRange".. How could this be fixed??
+	// "within the attackRange".. How could this be fixed??
 	// (i simply.. i guess maybe colliders have an IsInBoundingBox thing maybe?
 	// physics systems tend to have that... but the parallel selves we're
 	// tracking in the game don't have colliders!!)
@@ -25,6 +27,7 @@ public class EnemyFollow : MonoBehaviour {
 	void Awake() {
 		agent = GetComponent<NavMeshAgent>();
 		animator = GetComponent<Animator>();
+		audio = GetComponent<AudioSource>();
 		
 		em = transform.parent.GetComponent<EnemyManager>();
 	}
@@ -41,7 +44,7 @@ public class EnemyFollow : MonoBehaviour {
 	void LateUpdate() {
 		if (alive) {
 			GameObject nearestTarget = em.GetTargetNearestTo(transform.position);
-			if (em.scared) {
+			if (em.isScared) {
 				// Run away from thing, and don't even try to hurt them.
 				// (Thought there was gonna be some built-in way, but
 				//  this works fine too.)
@@ -53,9 +56,15 @@ public class EnemyFollow : MonoBehaviour {
 				agent.destination = nearestTarget.transform.position;
 				
 				// If close, attack at an interval.
-				if (WithinAttackDistance(nearestTarget)) {
-					Attack(nearestTarget);
-				}
+				// float attackTime = Time.time - lastAttack;
+				// if (attackTime >= attackRate) {
+					if (WithinAttackDistance(nearestTarget)) {
+						Attack(nearestTarget);
+						// lastAttack += attackRate;
+					// } else {
+					// 	lastAttack = Time.time - attackRate * 1.1f;
+					}
+				// }
 			}
 		}
 	}
@@ -68,7 +77,7 @@ public class EnemyFollow : MonoBehaviour {
 		);
 		
 		// Ensure close enough to target to attack.
-		if (Vector3.Distance(this.transform.position, targetXZ) > hurtRange)
+		if (Vector3.Distance(this.transform.position, targetXZ) > attackRange)
 			return false;
 		
 		// Ensure no other enemies between this and target.
@@ -88,8 +97,8 @@ public class EnemyFollow : MonoBehaviour {
 	}
 	
 	void Attack(GameObject target) {
-		float thisPower = hurtPower * Random.Range(0.85f, 1.1f);
-		target.SendMessage("Hurt", thisPower);
+		float thisPower = attackPower * Random.Range(0.85f, 1.1f) * Time.deltaTime;
+		target.SendMessage("Hurt", (this.gameObject, thisPower));
 	}
 	
 	// === MESSAGES ===
@@ -106,6 +115,10 @@ public class EnemyFollow : MonoBehaviour {
 	
 	void Die() {
 		alive = false;
+		
+		audio.pitch = Random.Range(0.9f, 1.1f);
+		audio.Play();
+		
 		animator.Play("Death");
 		agent.ResetPath();
 	}
@@ -118,12 +131,14 @@ public class EnemyFollow : MonoBehaviour {
 		Destroy(this);
 	}
 	
+	// === DEBUG GARBAGE ===
+	
 	// Gizmo funny
 	void OnDrawGizmosSelected() {
 		Gizmos.color = Color.yellow;
 		Gizmos.DrawLine(
 			this.transform.position,
-			this.transform.position + this.transform.forward * hurtRange
+			this.transform.position + this.transform.forward * attackRange
 		);
 	}
 }

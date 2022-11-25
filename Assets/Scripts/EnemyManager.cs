@@ -5,16 +5,23 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour {
 	public List<GameObject> targets;
 	
-	bool scared_ = false;
-	public bool scared {
-		get => scared_;
+	public float scareTimeLength = 7f;
+	
+	bool scared = false;
+	float scareStartTime = 0f;
+	
+	public bool isScared { get => scared; }
+	
+	void LateUpdate() {
+		if (scared && (Time.time - scareStartTime) >= scareTimeLength) {
+			scared = false;
+			BroadcastMessage("Unscare", SendMessageOptions.DontRequireReceiver);
+		}
 	}
 	
-	void Scare() {
-		scared_ = !scared_;
-		foreach (Transform t in this.transform) {
-			t.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
-		}
+	public void Scare() {
+		scared = true;
+		scareStartTime = Time.time;
 	}
 	
 	public GameObject GetTargetNearestTo(Vector3 position) {

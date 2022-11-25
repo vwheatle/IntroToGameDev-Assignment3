@@ -6,20 +6,27 @@ public class Health : MonoBehaviour {
 	public float maxHealth = 10f;
 	float health = -1f;
 	
-	public float percentHealth {
-		get => health / maxHealth;
-	}
+	public float currentHealth { get => health; }
+	public float percentHealth { get => health / maxHealth; }
 	
 	void Awake() {
 		health = maxHealth;
 	}
 	
-	void Hurt(float amount) {
+	public void Heal(float amount) {
+		health = Mathf.Clamp(health + amount, 0f, maxHealth);
+	}
+	
+	// code smell.. :(
+	
+	void Hurt((GameObject, float) culpritAndAmount) {
+		(GameObject culprit, float amount) = culpritAndAmount;
 		health -= amount;
 		if (health <= 0f) {
 			this.gameObject.BroadcastMessage(
-				"Die", SendMessageOptions.DontRequireReceiver
+				"Die", culprit, SendMessageOptions.DontRequireReceiver
 			);
+			culprit?.SendMessage("Killer", SendMessageOptions.DontRequireReceiver);
 			Destroy(this);
 		}
 	}

@@ -21,6 +21,15 @@ public class PlayerMove : MonoBehaviour {
 	float lastFire;
 	public float fireRange = 32f;
 	
+	int killCount_ = 0;
+	public int killCount { get => killCount_; }
+	
+	public float strongTimeLength = 7f;
+	
+	bool strong = false;
+	public bool isStrong { get => strong; }
+	float strongStartTime = 0f;
+	
 	void Awake() {
 		cc = GetComponent<CharacterController>();
 		animator = GetComponent<Animator>();
@@ -52,15 +61,13 @@ public class PlayerMove : MonoBehaviour {
 			}
 		}
 		
-		// Scare enemies..
-		if (Input.GetButtonDown("Scare") || Input.GetButtonUp("Scare")) {
-			GameObject.Find("Enemies")
-				.SendMessage("Scare", SendMessageOptions.DontRequireReceiver);
-		}
-		
 		// Constant Y coordinate ( this is a 2D game now )
 		Vector3 a = this.transform.position;
 		a.y = startY; this.transform.position = a;
+		
+		// Limit powerup time.
+		if (strong && (Time.time - strongStartTime) >= strongTimeLength)
+			strong = false;
 	}
 	
 	// Moves the character controller in response to WASD stuff.
@@ -98,8 +105,9 @@ public class PlayerMove : MonoBehaviour {
 			1 << LayerMask.NameToLayer("Shoot"),
 			QueryTriggerInteraction.Collide
 		)) {
+			float strongMultiplier = strong ? 2f : 1f;
 			hit.collider.BroadcastMessage(
-				"Hurt", Random.Range(0.9f, 1.2f),
+				"Hurt", (this.gameObject, Random.Range(0.9f, 1.2f) * strongMultiplier),
 				SendMessageOptions.DontRequireReceiver
 			);
 			target = hit.point;
@@ -162,15 +170,32 @@ public class PlayerMove : MonoBehaviour {
 		cc.enabled = true;
 	}
 	
+	// Message from Powerup if you should become strong!
+	void Strong() {
+		strong = true;
+		strongStartTime = Time.time;
+	}
+	
+	// Message from enemies when you kill them!
+	void Killer() {
+		killCount_++;
+	}
+	
 	// Message from Health, if player runs out of HP...
 	void Die() {
 		animator.Play("Death");
 		alive = false;
+		
+		if (killCount > PlayerPrefs.GetInt("BestKills", 0)) {
+			PlayerPrefs.SetInt("BestKills", killCount);
+			// and then burst of confetti or whatever
+		}
 	}
 	
 	// Built-in animation event when dying...
 	void RestartLevel() {
 		Debug.Log("your'e daead.");
+		
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 }

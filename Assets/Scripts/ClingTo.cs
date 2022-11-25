@@ -10,7 +10,7 @@ public class ClingTo : MonoBehaviour {
 	}
 	
 	// Repeat Hurt message
-	void Hurt(float amount) {
-		thing.SendMessage("Hurt", amount, SendMessageOptions.DontRequireReceiver);
+	void Hurt((GameObject, float) packet) {
+		thing.SendMessage("Hurt", packet, SendMessageOptions.DontRequireReceiver);
 	}
 }
