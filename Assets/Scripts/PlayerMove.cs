@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerMove : MonoBehaviour {
+	public GameOverListener gameOverUI;
+	
 	CharacterController cc;
 	Animator animator;
 	new AudioSource audio;
@@ -186,7 +188,12 @@ public class PlayerMove : MonoBehaviour {
 		animator.Play("Death");
 		alive = false;
 		
-		if (killCount > PlayerPrefs.GetInt("BestKills", 0)) {
+		int prevHighScore = PlayerPrefs.GetInt("BestKills", 10);
+		bool newHighScore = killCount > prevHighScore;
+		
+		gameOverUI.SendMessage("GameOver", (newHighScore, killCount));
+		
+		if (newHighScore) {
 			PlayerPrefs.SetInt("BestKills", killCount);
 			// and then burst of confetti or whatever
 		}
@@ -194,8 +201,6 @@ public class PlayerMove : MonoBehaviour {
 	
 	// Built-in animation event when dying...
 	void RestartLevel() {
-		Debug.Log("your'e daead.");
-		
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 }

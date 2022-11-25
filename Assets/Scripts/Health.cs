@@ -21,6 +21,7 @@ public class Health : MonoBehaviour {
 	
 	void Hurt((GameObject, float) culpritAndAmount) {
 		(GameObject culprit, float amount) = culpritAndAmount;
+		if (health <= 0f) return;
 		health -= amount;
 		if (health <= 0f) {
 			this.gameObject.BroadcastMessage(
