@@ -7,7 +7,7 @@ public class Health : MonoBehaviour {
 	float health = -1f;
 	
 	public float currentHealth { get => health; }
-	public float percentHealth { get => health / maxHealth; }
+	public float percentHealth { get => Mathf.Clamp01(health / maxHealth); }
 	
 	void Awake() {
 		health = maxHealth;
