@@ -8,4 +8,9 @@ public class ClingTo : MonoBehaviour {
 	void LateUpdate() {
 		this.transform.position = thing.transform.position;
 	}
+	
+	// Repeat Hurt message
+	void Hurt(float amount) {
+		thing.SendMessage("Hurt", amount, SendMessageOptions.DontRequireReceiver);
+	}
 }

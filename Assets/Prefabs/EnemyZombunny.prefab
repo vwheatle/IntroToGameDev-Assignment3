@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 4093280172866775796}
   - component: {fileID: 4093280172856919390}
   - component: {fileID: 4093280172866383923}
+  - component: {fileID: 793353914252620039}
   - component: {fileID: 4093280172866383922}
-  - component: {fileID: 3982338241750656408}
+  - component: {fileID: 8815786054726339673}
   - component: {fileID: 277159477042251580}
   m_Layer: 8
   m_Name: EnemyZombunny
@@ -67,7 +68,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7b9e0c60ac50974b9b995e71567d35b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  hurtPower: 1
+  hurtRange: 1.5
+  wellIJustHitThisGameObject: {fileID: 0}
+--- !u!114 &793353914252620039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4093280172866287316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca6fc89b4d7dbb847bbea1816145912e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 3.5
 --- !u!195 &4093280172866383922
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -90,7 +106,7 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!135 &3982338241750656408
+--- !u!135 &8815786054726339673
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

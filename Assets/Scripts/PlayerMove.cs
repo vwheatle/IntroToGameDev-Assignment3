@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMove : MonoBehaviour {
 	CharacterController cc;
@@ -8,6 +9,8 @@ public class PlayerMove : MonoBehaviour {
 	new AudioSource audio;
 	
 	Transform gunBarrelEnd;
+	
+	bool alive = true;
 	
 	public float moveSpeed = 2f;
 	
@@ -27,10 +30,12 @@ public class PlayerMove : MonoBehaviour {
 		
 		gunBarrelEnd = transform.Find("GunBarrelEnd");
 		
-		lastFire = Time.time;
+		lastFire = Time.time - fireRate;
 	}
 	
 	void Update() {
+		if (!alive) return;
+		
 		// Move around..
 		bool isWalking = Move();
 		animator.SetBool("IsWalking", isWalking);
@@ -59,7 +64,7 @@ public class PlayerMove : MonoBehaviour {
 	}
 	
 	// Moves the character controller in response to WASD stuff.
-	// Returns if you moved a non-zero amount.
+	// Returns true if you moved a non-zero amount.
 	bool Move() {
 		Vector2 wasd = new Vector2(
 			Input.GetAxisRaw("Horizontal"),
@@ -155,5 +160,17 @@ public class PlayerMove : MonoBehaviour {
 		cc.enabled = false;
 		transform.position = warpPosition;
 		cc.enabled = true;
+	}
+	
+	// Message from Health, if player runs out of HP...
+	void Die() {
+		animator.Play("Death");
+		alive = false;
+	}
+	
+	// Built-in animation event when dying...
+	void RestartLevel() {
+		Debug.Log("your'e daead.");
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 }
